@@ -32,6 +32,9 @@ import com.allegro.webapi.holders.ArrayOfSearchResponseHolder;
 public class MultiSearchClient {
 	private AllegroWebApiPortType port;
 	private StringHolder sessionHandlePart;
+	private SearchStrategy searchStrategy;
+	
+	private List<String> searchQueries;
 
 	public MultiSearchClient(String username, String password, String key)
 			throws RemoteException, ServiceException, NoSuchAlgorithmException,
@@ -79,8 +82,20 @@ public class MultiSearchClient {
 		return Base64.encode(md.digest());
 	}
 	
-	public List<SearchResponseType> search(final String phrase) throws RemoteException {
-		return search(phrase, null);
+	public void setSearchQueries(String... searchQueries) {
+		this.searchQueries = Arrays.asList(searchQueries);
+	}
+	
+	public List<String> getSearchQueries(String... searchQueries) {
+		return this.searchQueries;
+	}
+	
+	public void setSearchStrategy(SearchStrategy searchStrategy) {
+		this.searchStrategy = searchStrategy;
+	}
+	
+	public void search() throws RemoteException {
+		searchStrategy.search();
 	}
 	
 	public List<SearchResponseType> search(final String phrase, final SellerInfoStruct seller) throws RemoteException {
@@ -89,8 +104,6 @@ public class MultiSearchClient {
 
 		int sellerId = seller == null ? 0 : seller.getSellerId();
 		
-//		System.out.println("Searching for '" + phrase + "' by '"
-//				+ seller.getSellerName() + "'... ");
 		IntHolder searchCount = new IntHolder();
 		IntHolder searchCountFeatured = new IntHolder();
 		ArrayOfSearchResponseHolder searchArray = new ArrayOfSearchResponseHolder();
@@ -106,6 +119,7 @@ public class MultiSearchClient {
 			searchResponseItems.addAll(Arrays.asList(searchArray.value));
 			offset += limit;
 		} while (searchArray.value.length > 0);
+
 		if (searchCount.value > 0) {
 			System.out.print("Found " + searchCount.value + " items for '"
 					+ phrase + "'");
@@ -114,6 +128,7 @@ public class MultiSearchClient {
 			else
 				System.out.println(".");
 		}
+
 		return searchResponseItems;
 	}	
 	
