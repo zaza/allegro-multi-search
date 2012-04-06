@@ -9,11 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
@@ -25,12 +22,9 @@ import org.apache.axis.encoding.Base64;
 
 import com.allegro.webapi.AllegroWebApiPortType;
 import com.allegro.webapi.AllegroWebApiServiceLocator;
-import com.allegro.webapi.ItemInfo;
-import com.allegro.webapi.MyAccountStruct2;
 import com.allegro.webapi.SearchOptType;
 import com.allegro.webapi.SearchResponseType;
 import com.allegro.webapi.SellerInfoStruct;
-import com.allegro.webapi.SellerShipmentDataStruct;
 import com.allegro.webapi.holders.ArrayOfCategoriesStructHolder;
 import com.allegro.webapi.holders.ArrayOfExcludedWordsHolder;
 import com.allegro.webapi.holders.ArrayOfSearchResponseHolder;
@@ -85,25 +79,16 @@ public class MultiSearchClient {
 		return Base64.encode(md.digest());
 	}
 	
-	public SearchResponseType[] search(final String phrase) throws RemoteException {
-//		System.out.println("Searching for '" + phrase + "'... ");
-		IntHolder searchCount = new IntHolder();
-		IntHolder searchCountFeatured = new IntHolder();
-		ArrayOfSearchResponseHolder searchArray = new ArrayOfSearchResponseHolder();
-		ArrayOfExcludedWordsHolder searchExcludedWords = new ArrayOfExcludedWordsHolder();
-		ArrayOfCategoriesStructHolder searchCategories = new ArrayOfCategoriesStructHolder();
-		
-		port.doSearch(sessionHandlePart.value, new SearchOptType(phrase, 0,
-				0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0), searchCount,
-				searchCountFeatured, searchArray, searchExcludedWords,
-				searchCategories);
-
-		System.out.println("Found " + searchCount.value + " items for '"
-				+ phrase + "'.");
-		return searchArray.value;
+	public List<SearchResponseType> search(final String phrase) throws RemoteException {
+		return search(phrase, null);
 	}
 	
-	public SearchResponseType[] search(final String phrase, final SellerInfoStruct seller) throws RemoteException {
+	public List<SearchResponseType> search(final String phrase, final SellerInfoStruct seller) throws RemoteException {
+		int offset = 0;
+		int limit = 25;
+
+		int sellerId = seller == null ? 0 : seller.getSellerId();
+		
 //		System.out.println("Searching for '" + phrase + "' by '"
 //				+ seller.getSellerName() + "'... ");
 		IntHolder searchCount = new IntHolder();
@@ -112,15 +97,24 @@ public class MultiSearchClient {
 		ArrayOfExcludedWordsHolder searchExcludedWords = new ArrayOfExcludedWordsHolder();
 		ArrayOfCategoriesStructHolder searchCategories = new ArrayOfCategoriesStructHolder();
 		
-		port.doSearch(sessionHandlePart.value, new SearchOptType(phrase, 0,
-				0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, seller.getSellerId()), searchCount,
-				searchCountFeatured, searchArray, searchExcludedWords,
-				searchCategories);
-
-		if (searchCount.value > 0)
-			System.out.println("Found " + searchCount.value + " items for '"
-					+ phrase + "' by '" + seller.getSellerName()+"'.");
-		return searchArray.value;
+		List<SearchResponseType> searchResponseItems = new ArrayList<SearchResponseType>();
+		do {
+			port.doSearch(sessionHandlePart.value, new SearchOptType(phrase, 0,
+					0, 0, 0, 0, offset, "", 0, 0, 0, limit, 0, sellerId), searchCount,
+					searchCountFeatured, searchArray, searchExcludedWords,
+					searchCategories);
+			searchResponseItems.addAll(Arrays.asList(searchArray.value));
+			offset += limit;
+		} while (searchArray.value.length > 0);
+		if (searchCount.value > 0) {
+			System.out.print("Found " + searchCount.value + " items for '"
+					+ phrase + "'");
+			if (seller != null)
+				System.out.println(" by '" + seller.getSellerName()+"'.");
+			else
+				System.out.println(".");
+		}
+		return searchResponseItems;
 	}	
 	
 	private long readAllegroKey() {
@@ -137,7 +131,7 @@ public class MultiSearchClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (in!=null)
+			if (in != null)
 				try {
 					in.close();
 				} catch (IOException e) {
