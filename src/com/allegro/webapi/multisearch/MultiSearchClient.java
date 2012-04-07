@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.holders.IntHolder;
@@ -86,7 +87,7 @@ public class MultiSearchClient {
 		this.searchQueries = Arrays.asList(searchQueries);
 	}
 	
-	public List<String> getSearchQueries(String... searchQueries) {
+	public List<String> getSearchQueries() {
 		return this.searchQueries;
 	}
 	
@@ -94,8 +95,8 @@ public class MultiSearchClient {
 		this.searchStrategy = searchStrategy;
 	}
 	
-	public void search() throws RemoteException {
-		searchStrategy.search();
+	public Map<SellerInfoStruct, List<SearchResponseType>> search() throws RemoteException {
+		return searchStrategy.search();
 	}
 	
 	public List<SearchResponseType> search(final String phrase, final SellerInfoStruct seller) throws RemoteException {
