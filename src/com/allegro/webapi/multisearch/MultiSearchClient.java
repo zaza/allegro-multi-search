@@ -36,8 +36,6 @@ public class MultiSearchClient {
 	private StringHolder sessionHandlePart;
 	private SearchStrategy searchStrategy;
 	
-	private List<String> searchQueries;
-
 	public MultiSearchClient(String username, String password, String key)
 			throws RemoteException, ServiceException, NoSuchAlgorithmException,
 			UnsupportedEncodingException {
@@ -82,14 +80,6 @@ public class MultiSearchClient {
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		md.update(password.getBytes("UTF-8"));
 		return Base64.encode(md.digest());
-	}
-	
-	public void setSearchQueries(String... searchQueries) {
-		this.searchQueries = Arrays.asList(searchQueries);
-	}
-	
-	public List<String> getSearchQueries() {
-		return this.searchQueries;
 	}
 	
 	public void setSearchStrategy(SearchStrategy searchStrategy) {

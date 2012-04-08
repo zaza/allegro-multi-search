@@ -1,6 +1,7 @@
 package com.allegro.webapi.multisearch.strategies;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +12,18 @@ import com.allegro.webapi.multisearch.MultiSearchClient;
 public abstract class SearchStrategy {
 
 	protected MultiSearchClient client;
+	private List<String> searchQueries;
 
 	public SearchStrategy(MultiSearchClient client) {
 		this.client = client;
+	}
+
+	public void setSearchQueries(String... searchQueries) {
+		this.searchQueries = Arrays.asList(searchQueries);
+	}
+
+	public List<String> getSearchQueries() {
+		return this.searchQueries;
 	}
 
 	final public Map<SellerInfoStruct, List<SearchResponseType>> execute()

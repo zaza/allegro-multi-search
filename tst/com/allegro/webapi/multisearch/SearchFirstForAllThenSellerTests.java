@@ -30,11 +30,11 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearch3QueriesSimpleResults() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Arrays.asList(new String[] {"a", "b", "c"}));
 		when(client.search("a", null)).thenReturn(createSearchResponse("a,A"));
 		when(client.search("b", A)).thenReturn(createSearchResponse("b,A"));
 		when(client.search("c", A)).thenReturn(createSearchResponse("c,A"));
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
@@ -53,9 +53,9 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearchNoQueries() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Collections.<String>emptyList());
 		when(client.search("a", null)).thenReturn(createSearchResponse("a,A"));
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
@@ -68,9 +68,9 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearchSingleQueryNoResult() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Arrays.asList(new String[] {"a"}));
 		when(client.search("a", null)).thenReturn(Collections.<SearchResponseType>emptyList());
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {"a"});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
@@ -83,12 +83,12 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearch3QueriesNoSellerMatchingAll() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Arrays.asList(new String[] {"a", "b", "c"}));
 		when(client.search("a", null)).thenReturn(createSearchResponse("a,A", "a,B"));
 		when(client.search("b", A)).thenReturn(createSearchResponse("b,A"));
 		when(client.search("b", B)).thenReturn(Collections.<SearchResponseType>emptyList());
 		when(client.search("c", A)).thenReturn(Collections.<SearchResponseType>emptyList());
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
@@ -101,7 +101,6 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearch3Queries3Sellers2Matching() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Arrays.asList(new String[] {"a", "b", "c"}));
 		when(client.search("a", null)).thenReturn(createSearchResponse("a,A", "a,B", "a,C"));
 		when(client.search("b", A)).thenReturn(createSearchResponse("b,A"));
 		when(client.search("b", B)).thenReturn(createSearchResponse("b,B"));
@@ -110,6 +109,7 @@ public class SearchFirstForAllThenSellerTests {
 		when(client.search("c", B)).thenReturn(Collections.<SearchResponseType>emptyList());
 		when(client.search("c", C)).thenReturn(createSearchResponse("c,C"));
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
@@ -133,13 +133,13 @@ public class SearchFirstForAllThenSellerTests {
 	public void testSearchMoreItemsForSeller() throws RemoteException {
 		// given
 		MultiSearchClient client = mock(MultiSearchClient.class);
-		when(client.getSearchQueries()).thenReturn(Arrays.asList(new String[] {"a", "b", "c"}));
 		when(client.search("a", null)).thenReturn(createSearchResponse("a1,A", "a2,A", "a,B"));
 		when(client.search("b", A)).thenReturn(createSearchResponse("b,A"));
 		when(client.search("b", B)).thenReturn(createSearchResponse("b,B"));
 		when(client.search("c", A)).thenReturn(createSearchResponse("c,A"));
 		when(client.search("c", B)).thenReturn(createSearchResponse("c1,B", "c2,B"));
 		SearchStrategy strategy = new SearchFirstForAllThenBySeller(client);
+		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
 		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
