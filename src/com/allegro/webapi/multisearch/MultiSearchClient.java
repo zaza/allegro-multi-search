@@ -29,6 +29,7 @@ import com.allegro.webapi.SellerInfoStruct;
 import com.allegro.webapi.holders.ArrayOfCategoriesStructHolder;
 import com.allegro.webapi.holders.ArrayOfExcludedWordsHolder;
 import com.allegro.webapi.holders.ArrayOfSearchResponseHolder;
+import com.allegro.webapi.multisearch.strategies.SearchStrategy;
 
 public class MultiSearchClient {
 	private AllegroWebApiPortType port;
@@ -96,7 +97,7 @@ public class MultiSearchClient {
 	}
 	
 	public Map<SellerInfoStruct, List<SearchResponseType>> search() throws RemoteException {
-		return searchStrategy.search();
+		return searchStrategy.execute();
 	}
 	
 	public List<SearchResponseType> search(final String phrase, final SellerInfoStruct seller) throws RemoteException {

@@ -1,4 +1,4 @@
-package com.allegro.webapi.multisearch;
+package com.allegro.webapi.multisearch.strategies;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.allegro.webapi.SearchResponseType;
 import com.allegro.webapi.SellerInfoStruct;
+import com.allegro.webapi.multisearch.MultiSearchClient;
 
 public class SearchFirstForAllThenBySeller extends SearchStrategy {
 
@@ -16,7 +17,7 @@ public class SearchFirstForAllThenBySeller extends SearchStrategy {
 	}
 
 	@Override
-	public Map<SellerInfoStruct, List<SearchResponseType>> search() throws RemoteException {
+	protected Map<SellerInfoStruct, List<SearchResponseType>> search() throws RemoteException {
 		HashMap<SellerInfoStruct, List<SearchResponseType>> result = new HashMap<SellerInfoStruct, List<SearchResponseType>>();
 		// TODO: remove get by index
 		List<SearchResponseType> search1 = client.search(client

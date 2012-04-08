@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.allegro.webapi.SearchResponseType;
 import com.allegro.webapi.SellerInfoStruct;
+import com.allegro.webapi.multisearch.strategies.SearchFirstForAllThenBySeller;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
