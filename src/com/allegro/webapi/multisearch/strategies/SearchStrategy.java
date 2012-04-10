@@ -26,7 +26,7 @@ public abstract class SearchStrategy {
 		return this.searchQueries;
 	}
 
-	final public Map<SellerInfoStruct, List<SearchResponseType>> execute()
+	final public Map<SellerInfoStruct, List<List<SearchResponseType>>> execute()
 			throws RemoteException {
 		long start = System.currentTimeMillis();
 		try {
@@ -37,6 +37,6 @@ public abstract class SearchStrategy {
 		}
 	}
 
-	protected abstract Map<SellerInfoStruct, List<SearchResponseType>> search()
+	protected abstract Map<SellerInfoStruct, List<List<SearchResponseType>>> search()
 			throws RemoteException;
 }

@@ -17,28 +17,38 @@ public class SearchFirstForAllThenBySeller extends SearchStrategy {
 	}
 
 	@Override
-	protected Map<SellerInfoStruct, List<SearchResponseType>> search()
+	protected Map<SellerInfoStruct, List<List<SearchResponseType>>> search()
 			throws RemoteException {
-		HashMap<SellerInfoStruct, List<SearchResponseType>> result = new HashMap<SellerInfoStruct, List<SearchResponseType>>();
-		// TODO: remove get by index
-		List<SearchResponseType> search1 = client.search(getSearchQueries()
-				.get(0), null);
-		for (SearchResponseType s1 : search1) {
-			SellerInfoStruct seller = s1.getSItSellerInfo();
-			List<SearchResponseType> search2 = client.search(getSearchQueries()
-					.get(1), seller);
-			if (search2.size() > 0) {
-				List<SearchResponseType> search3 = client.search(
-						getSearchQueries().get(2), seller);
-				if (search3.size() > 0) {
-					List<SearchResponseType> auctions = new ArrayList<SearchResponseType>(
-							getSearchQueries().size());
-					auctions.add(s1);
-					auctions.add(search2.get(0));
-					auctions.add(search3.get(0));
-					result.put(seller, auctions);
+		HashMap<SellerInfoStruct, List<List<SearchResponseType>>> result = new HashMap<SellerInfoStruct, List<List<SearchResponseType>>>();
+		if (getSearchQueries().iterator().hasNext()) {
+			List<SearchResponseType> searchResult = client.search(getSearchQueries().get(0), null);
+			Map<SellerInfoStruct, List<SearchResponseType>> searchResultBySeller = groupBySeller(searchResult);
+			SELLER: for (SellerInfoStruct seller : searchResultBySeller.keySet()) {
+				List<List<SearchResponseType>> searchQueriesResult = new ArrayList<List<SearchResponseType>>(getSearchQueries().size());
+				searchQueriesResult.add(searchResultBySeller.get(seller));
+				for (int i = 1; i < getSearchQueries().size(); i++) {
+					List<SearchResponseType> search2 = client.search(getSearchQueries().get(i), seller);
+					if (search2.size() > 0) {
+						searchQueriesResult.add(search2);
+					} else {
+						continue SELLER;
+					}
 				}
+				if (searchQueriesResult.size() == getSearchQueries().size())
+					result.put(seller, searchQueriesResult);
 			}
+		}
+		return result;
+	}
+
+	private Map<SellerInfoStruct, List<SearchResponseType>> groupBySeller(
+			List<SearchResponseType> searchResult) {
+		HashMap<SellerInfoStruct, List<SearchResponseType>> result = new HashMap<SellerInfoStruct, List<SearchResponseType>>();
+		for (SearchResponseType s : searchResult) {
+			SellerInfoStruct seller = s.getSItSellerInfo();
+			List<SearchResponseType> auctions = result.containsKey(seller) ? result.get(seller)	: new ArrayList<SearchResponseType>();
+			auctions.add(s);
+			result.put(seller, auctions);
 		}
 		return result;
 	}

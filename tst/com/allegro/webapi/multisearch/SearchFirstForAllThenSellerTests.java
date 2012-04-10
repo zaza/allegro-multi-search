@@ -37,16 +37,10 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
-		assertResult(result, "A:a,b,c");
-		assertFalse(result.isEmpty());
-		assertTrue(result.containsKey(A));
-		assertFalse(result.get(A).isEmpty());
-		assertEquals("a", result.get(A).get(0).getSItName());
-		assertEquals("b", result.get(A).get(1).getSItName());
-		assertEquals("c", result.get(A).get(2).getSItName());
+		assertResult(result, "A:a;b;c");
 	}
 	
 	@Test
@@ -58,7 +52,7 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
 		assertTrue(result.isEmpty());
@@ -73,7 +67,7 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {"a"});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
 		assertTrue(result.isEmpty());
@@ -91,7 +85,7 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
 		assertTrue(result.isEmpty());
@@ -112,21 +106,10 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
-		assertResult(result, "A:a,b,c", "C:a,b,c");
-		assertFalse(result.isEmpty());
-		assertTrue(result.containsKey(A));
-		assertFalse(result.get(A).isEmpty());
-		assertEquals("a", result.get(A).get(0).getSItName());
-		assertEquals("b", result.get(A).get(1).getSItName());
-		assertEquals("c", result.get(A).get(2).getSItName());
-		assertFalse(result.containsKey(B));
-		assertTrue(result.containsKey(C));
-		assertEquals("a", result.get(C).get(0).getSItName());
-		assertEquals("b", result.get(C).get(1).getSItName());
-		assertEquals("c", result.get(C).get(2).getSItName());
+		assertResult(result, "A:a;b;c", "C:a;b;c");
 	}
 	
 	@Test
@@ -142,10 +125,10 @@ public class SearchFirstForAllThenSellerTests {
 		strategy.setSearchQueries(new String[] {"a", "b", "c"});
 		
 		// when
-		Map<SellerInfoStruct, List<SearchResponseType>> result = strategy.execute();
+		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = strategy.execute();
 		
 		// then
-		assertResult(result, "A:a1,a2,b,c", "B:a,b,c1,c2");
+		assertResult(result, "A:a1,a2;b;c", "B:a;b;c1,c2");
 	}
 	
 	private static List<SearchResponseType> createSearchResponse(
@@ -165,17 +148,21 @@ public class SearchFirstForAllThenSellerTests {
 		return new SellerInfoStruct(1, sellerName, 0, 0);
 	}
 	
-	private static void assertResult(Map<SellerInfoStruct, List<SearchResponseType>> result, String... expectedResults) {
+	private static void assertResult(Map<SellerInfoStruct, List<List<SearchResponseType>>> result, String... expectedResults) {
 		assertFalse(result.isEmpty());
 		for (String expectedResult : expectedResults) {
 			String[] split = expectedResult.split(":");
 			String sellerName = split[0];
-			String[] items = split[1].split(",");
+			String[] groups = split[1].split(";");
 			SellerInfoStruct seller = createSeller(sellerName);
 			assertTrue(result.containsKey(seller));
 			assertFalse(result.get(seller).isEmpty());
-			for (int i = 0; i < items.length; i++) {
-				assertEquals(items[i], result.get(seller).get(i).getSItName());
+			for (int i = 0; i < groups.length; i++) {
+				String[] items = groups[i].split(",");
+				assertEquals(items.length, result.get(seller).get(i).size());
+				for (int j = 0; j < items.length; j++) {
+					assertEquals(items[j], result.get(seller).get(i).get(j).getSItName());
+				}
 			}
 		}
 	}

@@ -86,7 +86,7 @@ public class MultiSearchClient {
 		this.searchStrategy = searchStrategy;
 	}
 	
-	public Map<SellerInfoStruct, List<SearchResponseType>> search() throws RemoteException {
+	public Map<SellerInfoStruct, List<List<SearchResponseType>>> search() throws RemoteException {
 		return searchStrategy.execute();
 	}
 	
