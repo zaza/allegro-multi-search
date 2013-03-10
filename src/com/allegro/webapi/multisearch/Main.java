@@ -14,6 +14,8 @@ public class Main {
 		strategy.setSearchQueries(args[3].split(","));
 		client.setSearchStrategy(strategy);
 		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = client.search();
+		if (result.isEmpty())
+			System.out.println("No seller found offering all the products.");
 		for (SellerInfoStruct seller : result.keySet())
 			System.out.println("http://allegro.pl/show_user.php?search=" + seller.getSellerName());
 	}
