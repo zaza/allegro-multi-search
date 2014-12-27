@@ -33,7 +33,7 @@ public abstract class SearchStrategy {
 			return search();
 		} finally {
 			long end = System.currentTimeMillis();
-			System.out.println("Executed in " + (end - start) + " ms.");
+			client.println("Executed in " + (end - start) + " ms.");
 		}
 	}
 

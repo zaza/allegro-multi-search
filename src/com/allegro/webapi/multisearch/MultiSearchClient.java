@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
@@ -35,10 +36,19 @@ public class MultiSearchClient {
 	private AllegroWebApiPortType port;
 	private StringHolder sessionHandlePart;
 	private SearchStrategy searchStrategy;
-	
+	private final PrintStream out;
+
 	public MultiSearchClient(String username, String password, String key)
 			throws RemoteException, ServiceException, NoSuchAlgorithmException,
 			UnsupportedEncodingException {
+		this(username, password, key, System.out);
+	}
+
+	public MultiSearchClient(String username, String password, String key, PrintStream out)
+			throws RemoteException, ServiceException, NoSuchAlgorithmException,
+			UnsupportedEncodingException {
+
+		this.out = out;
 
 		// Make a service
 		AllegroWebApiServiceLocator service = new AllegroWebApiServiceLocator();
@@ -56,23 +66,23 @@ public class MultiSearchClient {
 		StringHolder info = new StringHolder();
 		LongHolder currentVerKey = new LongHolder();
 
-		System.out.print("Receving key version... ");
+		print("Receving key version... ");
 		port.doQuerySysStatus(1, countryCode, webapiKey, info, currentVerKey);
-		System.out.println("done. Current version key=" + currentVerKey.value);
+		println("done. Current version key=" + currentVerKey.value);
 		
 		if (localVerKey != currentVerKey.value) {
-			System.err.println("Warning: key versions don't match!");
+			println("Warning: key versions don't match!");
 			localVerKey = currentVerKey.value;
 		}
 
 		sessionHandlePart = new StringHolder();
 		LongHolder userId = new LongHolder();
 		LongHolder serverTime = new LongHolder();
-		System.out.print("Logging in... ");
+		print("Logging in... ");
 		port.doLoginEnc(userLogin, encryptAndEncodePassword(userPassword),
 				countryCode, webapiKey, localVerKey, sessionHandlePart, userId,
 				serverTime);
-		System.out.println("done.");
+		println("done.");
 	}
 
 	private String encryptAndEncodePassword(String password)
@@ -113,12 +123,12 @@ public class MultiSearchClient {
 		} while (searchArray.value.length > 0);
 
 		if (searchCount.value > 0) {
-			System.out.print("Found " + searchCount.value + " items for '"
+			print("Found " + searchCount.value + " items for '"
 					+ phrase + "'");
 			if (seller != null)
-				System.out.println(" by '" + seller.getSellerName()+"'.");
+				println(" by '" + seller.getSellerName()+"'.");
 			else
-				System.out.println(".");
+				println(".");
 		}
 
 		return searchResponseItems;
@@ -146,5 +156,13 @@ public class MultiSearchClient {
 				}
 		}
 		return -1;
+	}
+
+	public void print(String s) {
+		out.print(s);
+	}
+
+	public void println(String s) {
+		out.println(s);
 	}
 }
