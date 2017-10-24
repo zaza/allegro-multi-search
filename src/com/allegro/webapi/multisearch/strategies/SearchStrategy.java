@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.allegro.webapi.SearchResponseType;
-import com.allegro.webapi.SellerInfoStruct;
+import com.allegro.webapi.UserInfoType;
 import com.allegro.webapi.multisearch.MultiSearchClient;
+import com.github.zaza.allegro.Item;
 
 public abstract class SearchStrategy {
 
@@ -26,7 +26,7 @@ public abstract class SearchStrategy {
 		return this.searchQueries;
 	}
 
-	final public Map<SellerInfoStruct, List<List<SearchResponseType>>> execute()
+	final public Map<UserInfoType, List<List<Item>>> execute()
 			throws RemoteException {
 		long start = System.currentTimeMillis();
 		try {
@@ -37,6 +37,5 @@ public abstract class SearchStrategy {
 		}
 	}
 
-	protected abstract Map<SellerInfoStruct, List<List<SearchResponseType>>> search()
-			throws RemoteException;
+	protected abstract Map<UserInfoType, List<List<Item>>> search() throws RemoteException;
 }

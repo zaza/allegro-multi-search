@@ -6,5 +6,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/allegro-webapi"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/mockito-all-1.9.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/allegro-client"/>
+	<classpathentry kind="lib" path="C:/Users/tomasz.zarna/.m2/repository/javax/xml/jaxrpc-api/1.1/jaxrpc-api-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tomasz.zarna/.m2/repository/commons-codec/commons-codec/1.10/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/tomasz.zarna/.m2/repository/com/google/guava/guava/21.0/guava-21.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

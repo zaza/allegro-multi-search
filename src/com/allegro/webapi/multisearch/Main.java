@@ -9,9 +9,9 @@ import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
-import com.allegro.webapi.SearchResponseType;
-import com.allegro.webapi.SellerInfoStruct;
+import com.allegro.webapi.UserInfoType;
 import com.allegro.webapi.multisearch.strategies.SearchFirstForAllThenBySeller;
+import com.github.zaza.allegro.Item;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
@@ -24,10 +24,10 @@ public class Main {
 		SearchFirstForAllThenBySeller strategy = new SearchFirstForAllThenBySeller(client);
 		strategy.setSearchQueries(query.split(","));
 		client.setSearchStrategy(strategy);
-		Map<SellerInfoStruct, List<List<SearchResponseType>>> result = client.search();
+		Map<UserInfoType, List<List<Item>>> result = client.search();
 		if (result.isEmpty())
 			out.println("No seller found offering all the products.");
-		for (SellerInfoStruct seller : result.keySet())
-			out.println("http://allegro.pl/show_user.php?search=" + seller.getSellerName());
+		for (UserInfoType seller : result.keySet())
+			out.println("http://allegro.pl/show_user.php?search=" + seller.getUserLogin());
 	}
 }

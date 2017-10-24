@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.allegro.webapi.SearchResponseType;
-import com.allegro.webapi.SellerInfoStruct;
+import com.allegro.webapi.UserInfoType;
 import com.allegro.webapi.multisearch.MultiSearchClient;
+import com.github.zaza.allegro.Item;
 
 public class SearchFirstForAllThenBySeller extends SearchStrategy {
 
@@ -17,17 +17,16 @@ public class SearchFirstForAllThenBySeller extends SearchStrategy {
 	}
 
 	@Override
-	protected Map<SellerInfoStruct, List<List<SearchResponseType>>> search()
-			throws RemoteException {
-		HashMap<SellerInfoStruct, List<List<SearchResponseType>>> result = new HashMap<SellerInfoStruct, List<List<SearchResponseType>>>();
+	protected Map<UserInfoType, List<List<Item>>> search() throws RemoteException {
+		Map<UserInfoType, List<List<Item>>> result = new HashMap<>();
 		if (getSearchQueries().iterator().hasNext()) {
-			List<SearchResponseType> searchResult = client.search(getSearchQueries().get(0), null);
-			Map<SellerInfoStruct, List<SearchResponseType>> searchResultBySeller = groupBySeller(searchResult);
-			SELLER: for (SellerInfoStruct seller : searchResultBySeller.keySet()) {
-				List<List<SearchResponseType>> searchQueriesResult = new ArrayList<List<SearchResponseType>>(getSearchQueries().size());
+			List<Item> searchResult = client.search(getSearchQueries().get(0), null);
+			Map<UserInfoType, List<Item>> searchResultBySeller = groupBySeller(searchResult);
+			SELLER: for (UserInfoType seller : searchResultBySeller.keySet()) {
+				List<List<Item>> searchQueriesResult = new ArrayList<List<Item>>(getSearchQueries().size());
 				searchQueriesResult.add(searchResultBySeller.get(seller));
 				for (int i = 1; i < getSearchQueries().size(); i++) {
-					List<SearchResponseType> search2 = client.search(getSearchQueries().get(i), seller);
+					List<Item> search2 = client.search(getSearchQueries().get(i), seller.getUserId());
 					if (search2.size() > 0) {
 						searchQueriesResult.add(search2);
 					} else {
@@ -41,12 +40,11 @@ public class SearchFirstForAllThenBySeller extends SearchStrategy {
 		return result;
 	}
 
-	private Map<SellerInfoStruct, List<SearchResponseType>> groupBySeller(
-			List<SearchResponseType> searchResult) {
-		HashMap<SellerInfoStruct, List<SearchResponseType>> result = new HashMap<SellerInfoStruct, List<SearchResponseType>>();
-		for (SearchResponseType s : searchResult) {
-			SellerInfoStruct seller = s.getSItSellerInfo();
-			List<SearchResponseType> auctions = result.containsKey(seller) ? result.get(seller)	: new ArrayList<SearchResponseType>();
+	private Map<UserInfoType, List<Item>> groupBySeller(List<Item> searchResult) {
+		HashMap<UserInfoType, List<Item>> result = new HashMap<>();
+		for (Item s : searchResult) {
+			UserInfoType seller = s.getSellerInfo();
+			List<Item> auctions = result.containsKey(seller) ? result.get(seller)	: new ArrayList<Item>();
 			auctions.add(s);
 			result.put(seller, auctions);
 		}
