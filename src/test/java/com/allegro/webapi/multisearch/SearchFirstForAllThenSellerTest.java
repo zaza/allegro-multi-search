@@ -21,7 +21,7 @@ import com.allegro.webapi.multisearch.strategies.SearchFirstForAllThenBySeller;
 import com.allegro.webapi.multisearch.strategies.SearchStrategy;
 import com.github.zaza.allegro.Item;
 
-public class SearchFirstForAllThenSellerTests {
+public class SearchFirstForAllThenSellerTest {
 	
 	@Test
 	public void testSearch3QueriesSimpleResults() throws RemoteException {
