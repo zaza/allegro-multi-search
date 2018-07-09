@@ -13,6 +13,7 @@ import com.allegro.webapi.UserInfoType;
 import com.allegro.webapi.multisearch.strategies.SearchStrategy;
 import com.github.zaza.allegro.AllegroClient;
 import com.github.zaza.allegro.Item;
+import com.github.zaza.allegro.SearchByStringBuilder;
 
 public class MultiSearchClient {
 	private SearchStrategy searchStrategy;
@@ -20,14 +21,12 @@ public class MultiSearchClient {
 	private AllegroClient client;
 
 	public MultiSearchClient(String username, String password, String key)
-			throws RemoteException, ServiceException, NoSuchAlgorithmException,
-			UnsupportedEncodingException {
+			throws RemoteException, ServiceException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		this(username, password, key, System.out);
 	}
 
 	public MultiSearchClient(String username, String password, String key, PrintStream out)
-			throws RemoteException, ServiceException, NoSuchAlgorithmException,
-			UnsupportedEncodingException {
+			throws RemoteException, ServiceException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		client = new AllegroClient(key);
 		this.out = out;
 	}
@@ -35,25 +34,28 @@ public class MultiSearchClient {
 	public void setSearchStrategy(SearchStrategy searchStrategy) {
 		this.searchStrategy = searchStrategy;
 	}
-	
+
 	public Map<UserInfoType, List<List<Item>>> search() throws RemoteException {
 		return searchStrategy.execute();
 	}
-	
+
 	public List<Item> search(final String phrase, final Integer sellerId) throws RemoteException {
-		List<Item> items = client.searchByString(phrase).userId(sellerId).search();
+		SearchByStringBuilder builder = client.searchByString(phrase);
+		if (sellerId != null)
+			builder = (SearchByStringBuilder) builder.userId(sellerId);
+		List<Item> items = builder.search();
 
 		if (!items.isEmpty()) {
-			print("Found " + items.size() + " items for '"	+ phrase + "'");
+			print("Found " + items.size() + " items for '" + phrase + "'");
 			if (sellerId != null)
-				println(" by '" + items.get(0).getSellerInfo().getUserLogin() +"'.");
+				println(" by '" + items.get(0).getSellerInfo().getUserLogin() + "'.");
 			else
 				println(".");
 		}
 
 		return items;
-	}	
-	
+	}
+
 	public void print(String s) {
 		out.print(s);
 	}

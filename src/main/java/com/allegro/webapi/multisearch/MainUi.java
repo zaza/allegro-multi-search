@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
@@ -142,14 +140,14 @@ public class MainUi extends JFrame {
 		queryField.setColumns(10);
 		
 		JButton searchButton = new JButton("szukaj");
-		searchButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					PrintStream out = new PrintStream(new TextAreaOutputStream(textArea));
-					Main.search(loginField.getText(), new String(passwordField.getPassword()), keyField.getText(), queryField.getText(), out);
-				} catch (RemoteException | NoSuchAlgorithmException	| UnsupportedEncodingException | ServiceException e) {
-					throw new RuntimeException(e);
-				}
+		searchButton.addActionListener(event -> {
+			try {
+				PrintStream out = new PrintStream(new TextAreaOutputStream(textArea));
+				textArea.setText("");
+				Main.search(loginField.getText(), new String(passwordField.getPassword()), keyField.getText(),
+						queryField.getText(), out);
+			} catch (RemoteException | NoSuchAlgorithmException | UnsupportedEncodingException | ServiceException e) {
+				throw new RuntimeException(e);
 			}
 		});
 		GridBagConstraints gbc_searchButton = new GridBagConstraints();
